@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="JSLIB/d3/d3.js"></script>
+    <script src="JSLIB/jquery-2.1.4/jquery.min.js"></script>
+</head>
+<body>
+<script>
+    var width = 1000;
+    var height = 1000;
+    var xscale = d3.scale.linear()
+            .domain([117,127])
+            .range([0,1000]);
+    var yscale = d3.scale.linear()
+            .domain([35,25])
+            .range([0,1000]);
+    
+    var dataset = new Object;
+    d3.json("Zhejiang_new2.json", function Read(data){
+        console.log(data);
+        dataset = data.features;
+        Draw(dataset);
+    });
+    
+    
+    var set =new Set;
+    function Draw(d){
+    var svg = d3.select("body").append("svg")  
+            .attr("width",width)  
+            .attr("height",height);
+    svg.selectAll("rect")
+        .data(dataset)
+        .enter()
+        .append("rect")
+        .attr("id",function(d){
+        set.add("r"+ d.geometry.id);
+        return "r"+ d.geometry.id;
+    })
+        .attr("x",function(d){
+            return xscale(d.geometry.p1.x);
+    })
+        .attr("y",function(d){
+            return yscale(d.geometry.p1.y)-Math.abs(yscale(d.geometry.p3.y) - yscale(d.geometry.p1.y));
+    })
+        .attr("width",function(d){
+//        console.log(Math.abs(xscale(d.geometry.p3.x) - xscale(d.geometry.p1.x)));
+            return Math.abs(xscale(d.geometry.p3.x) - xscale(d.geometry.p1.x));
+    })
+        .attr("height",function(d){
+            return Math.abs(yscale(d.geometry.p3.y) - yscale(d.geometry.p1.y));
+    })
+//        .attr("fill","steelblue");
+    }
+    var color = d3.scale.category20();
+    set.forEach(x=>
+                {var y = Math.random()*20;
+        d3.selectAll("#"+x)
+        .attr("fill",function(){
+//            return "blue";
+            return color(y);})}
+       )
+            
+</script>
+</body>
+</html>
